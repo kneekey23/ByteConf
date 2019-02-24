@@ -124,6 +124,9 @@ function getAudioStream() {
   function exportBuffer(recBuffer) {
     const downsampledBuffer = downsampleBuffer(recBuffer, 16000);
     const encodedWav = encodeWAV(downsampledBuffer);
+
+    //send to s3 and return url for wav file.
+    
     const audioBlob = new Blob([encodedWav], {
       type: 'application/octet-stream'
     });
