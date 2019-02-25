@@ -58,7 +58,7 @@ class Polly extends Component {
       
         render() {
           let result;
-          if(this.state.resultMessage != ''){
+          if(this.state.resultMessage !== ''){
             result = <p>{this.state.resultMessage}</p>
           }
           return (

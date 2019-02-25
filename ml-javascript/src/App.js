@@ -6,10 +6,6 @@ import Transcribe from './components/Transcribe';
 
 
 class App extends Component {
-constructor(props){
-  super(props);
-
-}
 
   render() {
     return (<Switch>

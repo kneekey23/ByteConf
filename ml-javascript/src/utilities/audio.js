@@ -52,6 +52,7 @@ function getAudioStream() {
     if (exportSampleRate === recordSampleRate) {
       return buffer;
     }
+
   
     const sampleRateRatio = recordSampleRate / exportSampleRate;
     const newLength = Math.round(buffer.length / sampleRateRatio);

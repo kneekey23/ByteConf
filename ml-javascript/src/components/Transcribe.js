@@ -1,12 +1,10 @@
 import React, {Component} from 'react';
 import RecorderJS from 'recorder-js';
+import ReactAudioPlayer from 'react-audio-player';
 import { getAudioStream, exportBuffer } from '../utilities/audio';
 import TranscribeService from "aws-sdk/clients/transcribeservice";
 import S3Service from "aws-sdk/clients/s3";
-// var AWS = require('aws-sdk');
-// AWS.config.region = 'us-east-1'; 
-// AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'us-east-1:1956382a-b3f6-472c-9a8d-3a246853c917'});
-
+var transcribeservice = new TranscribeService();
 
 
 class Transcribe extends Component {
@@ -15,11 +13,15 @@ class Transcribe extends Component {
         this.state = {
             stream: null,
             recording: false,
-            recorder: null
+            recorder: null,
+            transcriptionJobName: '',
+            transcription:'',
+            s3URL:''
         }
         this.startRecord = this.startRecord.bind(this);
         this.stopRecord = this.stopRecord.bind(this);
         this.transcribeAudio = this.transcribeAudio.bind(this);
+        this.getTranscription = this.getTranscription.bind(this);
        
     }
 
@@ -70,7 +72,7 @@ class Transcribe extends Component {
         s3.config.region = "us-east-1";
         let currentComponent = this;
         var params = {
-            ACL: "authenticated-read",
+            ACL: "public-read",
             Body: audio, 
             Bucket: "transcribe-output-js", 
             Key: "test.wav"
@@ -79,32 +81,49 @@ class Transcribe extends Component {
         s3.putObject(params, function(err, data) {
         if (err) console.log(err, err.stack); // an error occurred
         else{
-            let s3URL = "https://s3.amazonaws.com/transcribe-output-js/" + params.Key
+            currentComponent.setState({s3URL: "https://s3.amazonaws.com/transcribe-output-js/" + params.Key})
             console.log(data); // successful response
-            currentComponent.transcribeAudio(s3URL);
+            currentComponent.transcribeAudio();
         }          
 
         });     
       }
 
-    transcribeAudio(s3URL) {
-        var transcribeservice = new TranscribeService();
-    
+    transcribeAudio() {
+       
+        let job = Math.random();
+        this.setState({transcriptionJobName: 'BYTECONF_' + job});
         var params = {
             LanguageCode: "en-US", /* required */
             Media: { /* required */
-                MediaFileUri: s3URL
+                MediaFileUri: this.state.s3URL
             },
             MediaFormat: "wav", /* required */
-            TranscriptionJobName: 'BYTECONF_1', /* required */
-            MediaSampleRateHertz: 16000
+            TranscriptionJobName: this.state.transcriptionJobName
             };
             transcribeservice.startTranscriptionJob(params, function(err, data) {
             if (err) console.log(err, err.stack); // an error occurred
             else{
-                console.log(data.size); 
+                console.log(data); 
+                // do{
+                //     this.getTranscription();
+                //     console.log(data)
+                // } while (data.TranscriptionJob.TranscriptionJobStatus === "IN_PROGRESS");
             }          // successful response
         });
+    }
+
+    getTranscription() {
+       // var currentComponent = this;
+        var params = {
+            TranscriptionJobName: this.state.transcriptionJobName /* required */
+          };
+          transcribeservice.getTranscriptionJob(params, function(err, data) {
+            if (err) console.log(err, err.stack); // an error occurred
+            else{    
+               console.log(data)
+            }           // successful response
+          });
     }
 
     render() {
@@ -117,15 +136,27 @@ class Transcribe extends Component {
         return (
         <div className="container">
          <h1>Hello, ByteConf!</h1>
-        <div className="row">
-        <button
-        onClick={() => {
-          recording ? this.stopRecord() : this.startRecord();
-        }}
-        >
-        {recording ? 'Stop Recording' : 'Start Recording'}
-      </button>
-        </div>
+            <div className="row">
+                <div className="col-md-6">
+                    <button
+                    className={recording? 'btn btn-danger' : 'btn btn-success'}
+                    onClick={() => {
+                    recording ? this.stopRecord() : this.startRecord();
+                    }}
+                    >
+                    {recording ? 'Stop Recording' : 'Start Recording'}
+                    </button>
+                    <ReactAudioPlayer
+                    src={this.state.s3URL}
+                    autoPlay
+                    controls
+                  />
+                </div>
+                <div className="col-md-6">
+                <button className="btn btn-info" onClick={this.getTranscription}>Get Transcription</button>
+                <p>{this.state.transcription}</p>
+                </div>
+            </div>
         </div>)
     }
 }
