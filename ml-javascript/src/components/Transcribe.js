@@ -19,6 +19,7 @@ class Transcribe extends Component {
         }
         this.startRecord = this.startRecord.bind(this);
         this.stopRecord = this.stopRecord.bind(this);
+        this.transcribeAudio = this.transcribeAudio.bind(this);
        
     }
 
@@ -66,46 +67,45 @@ class Transcribe extends Component {
         this.setState({recording: false});
          //send audio file to s3 bucket to prepare for transcription
         var s3 = new S3Service();
-        s3.config.region = "us-west-2";
+        s3.config.region = "us-east-1";
+        let currentComponent = this;
         var params = {
             ACL: "authenticated-read",
             Body: audio, 
-            Bucket: "transcribe-test-js", 
+            Bucket: "transcribe-output-js", 
             Key: "test.wav"
            };
+     
+        s3.putObject(params, function(err, data) {
+        if (err) console.log(err, err.stack); // an error occurred
+        else{
+            let s3URL = "https://s3.amazonaws.com/transcribe-output-js/" + params.Key
+            console.log(data); // successful response
+            currentComponent.transcribeAudio(s3URL);
+        }          
 
-           s3.putObject(params, function(err, data) {
-            if (err) console.log(err, err.stack); // an error occurred
-            else     console.log(data);           // successful response
-            /*
-            data = {
-             ETag: "\"6805f2cfc46c0f04559748bb039d69ae\"", 
-             VersionId: "psM2sYY4.o1501dSx8wMvnkOzSBB.V4a"
-            }
-            */
-          });
-
-       
-
-
-       
-    //    var transcribeservice = new TranscribeService();
-    //     var params = {
-    //         LanguageCode: "en-US", /* required */
-    //         Media: { /* required */
-    //           MediaFileUri: 'STRING_VALUE'
-    //         },
-    //         MediaFormat: "wav", /* required */
-    //         TranscriptionJobName: 'BYTECONF_1', /* required */
-    //         MediaSampleRateHertz: 16000
-    //       };
-    //       transcribeservice.startTranscriptionJob(params, function(err, data) {
-    //         if (err) console.log(err, err.stack); // an error occurred
-    //         else{
-    //             console.log(data.size); 
-    //         }          // successful response
-    //       });
+        });     
       }
+
+    transcribeAudio(s3URL) {
+        var transcribeservice = new TranscribeService();
+    
+        var params = {
+            LanguageCode: "en-US", /* required */
+            Media: { /* required */
+                MediaFileUri: s3URL
+            },
+            MediaFormat: "wav", /* required */
+            TranscriptionJobName: 'BYTECONF_1', /* required */
+            MediaSampleRateHertz: 16000
+            };
+            transcribeservice.startTranscriptionJob(params, function(err, data) {
+            if (err) console.log(err, err.stack); // an error occurred
+            else{
+                console.log(data.size); 
+            }          // successful response
+        });
+    }
 
     render() {
         const { recording, stream } = this.state;

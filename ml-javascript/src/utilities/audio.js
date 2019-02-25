@@ -126,7 +126,22 @@ function getAudioStream() {
     const encodedWav = encodeWAV(downsampledBuffer);
 
     //send to s3 and return url for wav file.
+    // let AWS = require("aws-sdk");
+    // var s3 = new AWS.S3();
+    // s3.config.region = "us-west-2";
+    // var params = {
+    //     ACL: "authenticated-read",
+    //     Body: encodedWav, 
+    //     Bucket: "transcribe-test-js", 
+    //     Key: "test.wav"
+    //    };
     
+    // s3.putObject(params, function(err, data) {
+    // if (err) console.log(err, err.stack); // an error occurred
+    // else{
+    //     console.log(data); // successful response
+    //  }         
+    // });
     const audioBlob = new Blob([encodedWav], {
       type: 'application/octet-stream'
     });
