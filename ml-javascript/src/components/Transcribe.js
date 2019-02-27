@@ -5,7 +5,8 @@ import { getAudioStream, exportBuffer } from '../utilities/audio';
 import TranscribeService from "aws-sdk/clients/transcribeservice";
 import S3Service from "aws-sdk/clients/s3";
 var transcribeservice = new TranscribeService();
-
+var s3 = new S3Service();
+s3.config.region = "us-east-1";
 
 class Transcribe extends Component {
     constructor(props){
@@ -68,8 +69,7 @@ class Transcribe extends Component {
     
         this.setState({recording: false});
          //send audio file to s3 bucket to prepare for transcription
-        var s3 = new S3Service();
-        s3.config.region = "us-east-1";
+       
         let currentComponent = this;
         var params = {
             ACL: "public-read",
@@ -99,30 +99,61 @@ class Transcribe extends Component {
                 MediaFileUri: this.state.s3URL
             },
             MediaFormat: "wav", /* required */
-            TranscriptionJobName: this.state.transcriptionJobName
+            TranscriptionJobName: this.state.transcriptionJobName,
+            OutputBucketName: "transcribe-output-js"
             };
             transcribeservice.startTranscriptionJob(params, function(err, data) {
             if (err) console.log(err, err.stack); // an error occurred
             else{
-                console.log(data); 
-                // do{
-                //     this.getTranscription();
-                //     console.log(data)
-                // } while (data.TranscriptionJob.TranscriptionJobStatus === "IN_PROGRESS");
-            }          // successful response
+                console.log(data);  // successful response
+            }         
         });
     }
 
+   async givePublicAccessToTranscriptObject(key) {
+      var params = { 
+        ACL: 'public-read',
+        Bucket: "transcribe-output-js",
+        Key: key
+       };
+       await s3.putObjectAcl(params, function(err, data) {
+         if (err) console.log(err, err.stack); // an error occurred
+         else     console.log(data);           // successful response
+         /*
+         data = {
+         }
+         */
+       });
+    }
+
     getTranscription() {
-       // var currentComponent = this;
+        var currentComponent = this;
         var params = {
             TranscriptionJobName: this.state.transcriptionJobName /* required */
           };
           transcribeservice.getTranscriptionJob(params, function(err, data) {
             if (err) console.log(err, err.stack); // an error occurred
-            else{    
-               console.log(data)
-            }           // successful response
+            else{    // successful response
+                console.log(data)
+                if(data.TranscriptionJob.TranscriptionJobStatus === 'COMPLETED'){
+                  let url = data.TranscriptionJob.Transcript.TranscriptFileUri
+                  let key = url.replace('https://s3.amazonaws.com/transcribe-output-js/', '');
+                  console.log(key);
+                  currentComponent.givePublicAccessToTranscriptObject(key)
+                  .then(data => {
+                     //download data file
+                  let parsedObject = {};
+
+                  fetch(url)
+                    .then(response => response.json())
+                    .then(stringifiedData => parsedObject = JSON.parse(stringifiedData))
+                    .catch(error => console.log(`Failed because: ${error}`));
+
+                  console.log(parsedObject);
+                  });
+                 
+               }
+            }           
           });
     }
 
@@ -136,8 +167,9 @@ class Transcribe extends Component {
         return (
         <div className="container">
          <h1>Hello, ByteConf!</h1>
-            <div className="row">
-                <div className="col-md-6">
+            <div className="col-xs-12">
+                <div className="row">
+                  <div className="col-xs-6">
                     <button
                     className={recording? 'btn btn-danger' : 'btn btn-success'}
                     onClick={() => {
@@ -151,11 +183,13 @@ class Transcribe extends Component {
                     autoPlay
                     controls
                   />
+                  </div>
+                  <div className="col-xs-6">
+                  <button className="btn btn-info" onClick={this.getTranscription}>Get Transcription</button>
+                  <p>{this.state.transcription}</p>
+                  </div>
                 </div>
-                <div className="col-md-6">
-                <button className="btn btn-info" onClick={this.getTranscription}>Get Transcription</button>
-                <p>{this.state.transcription}</p>
-                </div>
+
             </div>
         </div>)
     }
