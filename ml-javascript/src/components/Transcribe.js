@@ -4,6 +4,7 @@ import ReactAudioPlayer from 'react-audio-player';
 import { getAudioStream, exportBuffer } from '../utilities/audio';
 import TranscribeService from "aws-sdk/clients/transcribeservice";
 import S3Service from "aws-sdk/clients/s3";
+
 var transcribeservice = new TranscribeService();
 var s3 = new S3Service();
 s3.config.region = "us-east-1";
@@ -110,20 +111,29 @@ class Transcribe extends Component {
         });
     }
 
-   async givePublicAccessToTranscriptObject(key) {
+   givePublicAccessToTranscriptObject(key) {
+
+    return new Promise((resolve, reject) => {
       var params = { 
         ACL: 'public-read',
         Bucket: "transcribe-output-js",
         Key: key
        };
-       await s3.putObjectAcl(params, function(err, data) {
-         if (err) console.log(err, err.stack); // an error occurred
-         else     console.log(data);           // successful response
-         /*
-         data = {
-         }
-         */
+      s3.putObjectAcl(params, function(err, data) {
+         if (err){ 
+           console.log(err, err.stack);
+           reject(err);
+         }// an error occurred
+         else{ // successful response
+          console.log(data);  
+          console.log("public access updated");
+           resolve(data);
+                   
+         }     
+
        });
+    })
+      
     }
 
     getTranscription() {
@@ -131,7 +141,7 @@ class Transcribe extends Component {
         var params = {
             TranscriptionJobName: this.state.transcriptionJobName /* required */
           };
-          transcribeservice.getTranscriptionJob(params, function(err, data) {
+         transcribeservice.getTranscriptionJob(params, function(err, data) {
             if (err) console.log(err, err.stack); // an error occurred
             else{    // successful response
                 console.log(data)
@@ -140,17 +150,23 @@ class Transcribe extends Component {
                   let key = url.replace('https://s3.amazonaws.com/transcribe-output-js/', '');
                   console.log(key);
                   currentComponent.givePublicAccessToTranscriptObject(key)
-                  .then(data => {
-                     //download data file
-                  let parsedObject = {};
+                    .then(data => {
+                        //download data file
+                        console.log("ready to download json file")
+                        let parsedObject = {};
 
-                  fetch(url)
-                    .then(response => response.json())
-                    .then(stringifiedData => parsedObject = JSON.parse(stringifiedData))
-                    .catch(error => console.log(`Failed because: ${error}`));
+                        fetch(url)
+                          .then(response => response.json())
+                          .then(json => {
+                            console.log(json.results.transcripts[0].transcript);
+                            currentComponent.setState({transcription: json.results.transcripts[0].transcript})
+                          
+                          })
+                          .catch(error => console.log(`Failed because: ${error}`));
 
-                  console.log(parsedObject);
-                  });
+                        console.log(parsedObject);
+                    })
+                   
                  
                }
             }           
