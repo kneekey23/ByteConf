@@ -18,6 +18,7 @@ class Transcribe extends Component {
             recorder: null,
             transcriptionJobName: '',
             transcription:'',
+            transcriptionJobComplete: false,
             s3URL:''
         }
         this.startRecord = this.startRecord.bind(this);
@@ -137,7 +138,7 @@ class Transcribe extends Component {
     }
 
     getTranscription() {
-   
+        this.setState({transcriptionJobComplete: true});
         var currentComponent = this;
         var params = {
             TranscriptionJobName: this.state.transcriptionJobName /* required */
@@ -152,6 +153,7 @@ class Transcribe extends Component {
                   }, 5000);
                 }
                 else if(data.TranscriptionJob.TranscriptionJobStatus === 'COMPLETED'){
+                  
                   let url = data.TranscriptionJob.Transcript.TranscriptFileUri
                   let key = url.replace('https://s3.amazonaws.com/transcribe-output-js/', '');
                   console.log(key);
@@ -164,6 +166,7 @@ class Transcribe extends Component {
                         fetch(url)
                           .then(response => response.json())
                           .then(json => {
+                            currentComponent.setState({transcriptionJobComplete: false});
                             console.log(json.results.transcripts[0].transcript);
                             currentComponent.setState({transcription: json.results.transcripts[0].transcript})
                           
@@ -182,7 +185,17 @@ class Transcribe extends Component {
 
     render() {
         const { recording, stream } = this.state;
-
+        let transcribeBtn;
+        if(!this.state.transcriptionJobComplete){
+          transcribeBtn =  <button className="btn btn-primary" onClick={this.getTranscription}>Get Transcription</button>
+        }
+        else{
+          transcribeBtn = <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span className="sr-only">Transcribing...</span>
+                          </button>
+        }
+        
         // Don't show record button if their browser doesn't support it.
         if (!stream) {
         return null;
@@ -208,7 +221,7 @@ class Transcribe extends Component {
                   />
                   </div>
                   <div className="col-xs-6">
-                  <button className="btn btn-info" onClick={this.getTranscription}>Get Transcription</button>
+                    {transcribeBtn}
                  
                   </div>
                 </div>
