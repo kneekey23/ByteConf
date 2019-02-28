@@ -64,7 +64,7 @@ class Polly extends Component {
           return (
             <div className="App">
                <div className="container">
-                <h1>Hello, ByteConf!</h1>
+                <h1>Amazon Polly</h1>
                 <div className="row">
                   <div className="col-md-6">
                     <form>
