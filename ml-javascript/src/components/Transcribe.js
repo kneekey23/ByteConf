@@ -161,7 +161,6 @@ class Transcribe extends Component {
                     .then(data => {
                         //download data file
                         console.log("ready to download json file")
-                        let parsedObject = {};
 
                         fetch(url)
                           .then(response => response.json())
@@ -173,7 +172,6 @@ class Transcribe extends Component {
                           })
                           .catch(error => console.log(`Failed because: ${error}`));
 
-                        console.log(parsedObject);
                     })
                    
                  
@@ -202,10 +200,11 @@ class Transcribe extends Component {
         }
         return (
         <div className="container">
-         <h1>Hello, ByteConf!</h1>
+         <h1>Amazon Transcribe</h1>
             <div className="col-xs-12">
                 <div className="row">
-                  <div className="col-xs-6">
+                  <div className="col-xs-2">
+                    <h3>Step 1</h3>
                     <button
                     className={recording? 'btn btn-danger' : 'btn btn-success'}
                     onClick={() => {
@@ -214,20 +213,26 @@ class Transcribe extends Component {
                     >
                     {recording ? 'Stop Recording' : 'Start Recording'}
                     </button>
+                    <h4>Record something to transcribe</h4>
+                    </div>
+                    <div className="col-xs-2">
+                    <h3>Step 2</h3>
                     <ReactAudioPlayer
                     src={this.state.s3URL}
                     autoPlay
                     controls
-                  />
+                    />
+                    <h4>Recording is uploaded to S3</h4>
                   </div>
-                  <div className="col-xs-6">
+                  <div className="col-xs-2">
+                    <h3>Step 3</h3>
                     {transcribeBtn}
-                 
+                    <h4>Get the transcription!</h4>
                   </div>
                 </div>
                 <div className="row">
                     <div className="col-xs-12">
-                    <h4>Transcription: {this.state.transcription}</h4>
+                    <h4>Transcription Result: {this.state.transcription}</h4>
                     </div>
                 </div>
 
