@@ -137,6 +137,7 @@ class Transcribe extends Component {
     }
 
     getTranscription() {
+   
         var currentComponent = this;
         var params = {
             TranscriptionJobName: this.state.transcriptionJobName /* required */
@@ -144,8 +145,13 @@ class Transcribe extends Component {
          transcribeservice.getTranscriptionJob(params, function(err, data) {
             if (err) console.log(err, err.stack); // an error occurred
             else{    // successful response
-                console.log(data)
-                if(data.TranscriptionJob.TranscriptionJobStatus === 'COMPLETED'){
+                console.log(data);
+                if(data.TranscriptionJob.TranscriptionJobStatus === 'IN_PROGRESS'){
+                  setTimeout(() => {
+                    currentComponent.getTranscription();
+                  }, 5000);
+                }
+                else if(data.TranscriptionJob.TranscriptionJobStatus === 'COMPLETED'){
                   let url = data.TranscriptionJob.Transcript.TranscriptFileUri
                   let key = url.replace('https://s3.amazonaws.com/transcribe-output-js/', '');
                   console.log(key);
@@ -171,6 +177,7 @@ class Transcribe extends Component {
                }
             }           
           });
+       
     }
 
     render() {
@@ -202,8 +209,13 @@ class Transcribe extends Component {
                   </div>
                   <div className="col-xs-6">
                   <button className="btn btn-info" onClick={this.getTranscription}>Get Transcription</button>
-                  <p>{this.state.transcription}</p>
+                 
                   </div>
+                </div>
+                <div className="row">
+                    <div className="col-xs-12">
+                    <h4>Transcription: {this.state.transcription}</h4>
+                    </div>
                 </div>
 
             </div>
