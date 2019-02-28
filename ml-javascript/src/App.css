@@ -35,3 +35,15 @@
 .card {
   width: 18rem;
 }
+
+.step{
+  padding: 40px;
+}
+
+.stepTitle {
+  padding-bottom: 20px;
+}
+
+.stepInstructions {
+  padding-top: 20px;
+}

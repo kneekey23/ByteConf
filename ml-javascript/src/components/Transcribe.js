@@ -4,6 +4,7 @@ import ReactAudioPlayer from 'react-audio-player';
 import { getAudioStream, exportBuffer } from '../utilities/audio';
 import TranscribeService from "aws-sdk/clients/transcribeservice";
 import S3Service from "aws-sdk/clients/s3";
+import '../App.css';
 
 var transcribeservice = new TranscribeService();
 var s3 = new S3Service();
@@ -203,8 +204,8 @@ class Transcribe extends Component {
          <h1>Amazon Transcribe</h1>
             <div className="col-xs-12">
                 <div className="row">
-                  <div className="col-xs-2">
-                    <h3>Step 1</h3>
+                  <div className="col-xs-2 step">
+                    <h3 className="stepTitle">Step 1</h3>
                     <button
                     className={recording? 'btn btn-danger' : 'btn btn-success'}
                     onClick={() => {
@@ -213,25 +214,25 @@ class Transcribe extends Component {
                     >
                     {recording ? 'Stop Recording' : 'Start Recording'}
                     </button>
-                    <h4>Record something to transcribe</h4>
+                    <h4 className="stepInstructions">Record something to transcribe</h4>
                     </div>
-                    <div className="col-xs-2">
-                    <h3>Step 2</h3>
+                    <div className="col-xs-2 step">
+                    <h3 className="stepTitle">Step 2</h3>
                     <ReactAudioPlayer
                     src={this.state.s3URL}
                     autoPlay
                     controls
                     />
-                    <h4>Recording is uploaded to S3</h4>
+                    <h4 className="stepInstructions">Recording is uploaded to S3</h4>
                   </div>
-                  <div className="col-xs-2">
-                    <h3>Step 3</h3>
+                  <div className="col-xs-2 step">
+                    <h3 className="stepTitle">Step 3</h3>
                     {transcribeBtn}
-                    <h4>Get the transcription!</h4>
+                    <h4 className="stepInstructions">Get the transcription!</h4>
                   </div>
                 </div>
                 <div className="row">
-                    <div className="col-xs-12">
+                    <div className="col-xs-12 step">
                     <h4>Transcription Result: {this.state.transcription}</h4>
                     </div>
                 </div>
