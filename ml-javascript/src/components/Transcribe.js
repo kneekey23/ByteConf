@@ -228,6 +228,7 @@ class Transcribe extends Component {
                   <div className="col-xs-2 step">
                     <h3 className="stepTitle">Step 3</h3>
                     {transcribeBtn}
+                    
                     <h4 className="stepInstructions">Get the transcription!</h4>
                   </div>
                 </div>

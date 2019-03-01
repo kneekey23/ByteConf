@@ -31,7 +31,7 @@ class Polly extends Component {
               SampleRate: "16000",
               Text: "",
               TextType: "text",
-              VoiceId: "Emma"
+              VoiceId: "Justin"
           };
       
           speechParams.Text = this.state.text;
