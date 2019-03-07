@@ -30,7 +30,9 @@ class Comprehend extends Component {
         
         // instantiate comprehend client
         var comprehend = new AWS.Comprehend({apiVersion: '2017-11-27'});
-        
+        let currentComponent = this;
+
+        // call detectSentiment endpoint
         comprehend.detectSentiment(comprehendParams, function (err, data){
             if (err) {
                 currentComponent.setState({resultMessage: err.message});
@@ -40,14 +42,6 @@ class Comprehend extends Component {
                 currentComponent.setState({resultMessage: "Text analyzed!"})
             }
         });
-
-        // API call
-        let currentComponent = this;
-        
-        comprehend.getResponse = () => {
-            
-            currentComponent.setState({resultMessage: "ANALYSIS HERE"});
-        };
 
     }
 
@@ -65,7 +59,6 @@ class Comprehend extends Component {
                 <div className="col-md-6">
                   <form>
                       <div className="form-group">
-                      
                           <input type="text" className="form-control" value={this.state.text} onChange={this.onChangeText} placeholder="Enter the text for Comprehend to analyze!"/>
                       </div>
                       <button type="button" className="btn btn-success" onClick={this.sendTextToComprehend}>Analyze text with Comprehend</button>
