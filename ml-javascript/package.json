@@ -5,6 +5,7 @@
   "dependencies": {
     "aws-sdk": "^2.409.0",
     "bootstrap": "^4.3.1",
+    "data-uri-to-buffer": "^2.0.0",
     "jquery": "^3.3.1",
     "popper": "^1.0.1",
     "react": "^16.8.2",
@@ -14,7 +15,9 @@
     "react-mic": "^12.4.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.5",
-    "recorder-js": "^1.0.7"
+    "react-webcam": "^1.1.1",
+    "recorder-js": "^1.0.7",
+    "semantic-ui-react": "^0.85.0"
   },
   "scripts": {
     "start": "react-scripts start",
