@@ -21,6 +21,8 @@ class Rekognition extends Component {
             resultMouthOpen: [],
             resultSmile: [],
             resultSunglasses: [],
+            resultBeard: [],
+            resultMisc: [],
             imageSrc: '',
       
         }
@@ -100,6 +102,7 @@ class Rekognition extends Component {
               currentComponent.setState({resultMustache: data.FaceDetails[0].Mustache});
               currentComponent.setState({resultSmile: data.FaceDetails[0].Smile});
               currentComponent.setState({resultSunglasses: data.FaceDetails[0].Sunglasses});
+              currentComponent.setState({resultBeard: data.FaceDetails[0].Beard});
               //currentComponent.setState({resultlandmarks: data.FaceDetails});
 
               // Add states for the other metadata
@@ -113,9 +116,10 @@ class Rekognition extends Component {
 
     
     render(){
-        let result, labels, landmarks /* emotions, mustaches, beards, sunglasses*/;
+        let result, labels, landmarks, emotions, misc /* emotions, mustaches, beards, sunglasses*/;
         if(this.state.resultMessage !== ''){
           result = <p>{this.state.resultMessage}</p>          
+          
           labels = this.state.resultLabels.map((label, i) => {
               return (<tr key={i}>
                         <td>
@@ -144,7 +148,8 @@ class Rekognition extends Component {
               )
               
             })
-            /* to be added with emotions 
+           
+            // to be added with emotions 
             emotions = this.state.resultEmotions.map((emotion, i) => {
               return (<tr key={i}>
                         <td>
@@ -156,8 +161,43 @@ class Rekognition extends Component {
                     </tr>
               )
               
-            }) */
-          
+            })
+            
+            
+            misc = 
+              <tbody>
+              <tr>
+                <td>Smile</td>
+                <td>{ this.state.resultSmile.Value+'' }</td>
+                <td>{this.state.resultSmile.Confidence}</td>
+              </tr>
+              <tr>
+                <td>MouthOpen</td>
+                <td>{ this.state.resultMouthOpen.Value+'' }</td>
+                <td>{this.state.resultMouthOpen.Confidence}</td>
+              </tr>
+              <tr>
+                <td>EyesOpen</td>
+                <td>{ this.state.resultEyesOpen.Value+'' }</td>
+                <td>{this.state.resultEyesOpen.Confidence}</td>
+              </tr>
+              <tr>
+                <td>Sunglasses</td>
+                <td>{ this.state.resultSunglasses.Value+'' }</td>
+                <td>{this.state.resultSunglasses.Confidence}</td>
+              </tr>
+              <tr>
+                <td>Mustache</td>
+                <td>{ this.state.resultMustache.Value+'' }</td>
+                <td>{this.state.resultMustache.Confidence}</td>
+              </tr>
+              <tr>
+                <td>Beard</td>
+                <td>{ this.state.resultBeard.Value+'' }</td>
+                <td>{this.state.resultBeard.Confidence}</td>
+              </tr>
+              </tbody>
+             
         }
         const videoConstraints = {
           facingMode: "user"
@@ -184,8 +224,10 @@ class Rekognition extends Component {
                         
                         </Form>
                     </div>
+                    
                     <div className="col-md-3">
-                      <span>Results:</span>{result}
+                    {result}
+                      <span><u>DetectLabels Results:</u></span>
                       <table>
                         <thead>
                           <tr>
@@ -203,6 +245,40 @@ class Rekognition extends Component {
                       </table>
                     </div>
                     <div className="col-md-3">
+                      <span><u>DetectFaces Results:</u></span>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>
+                              Emotion
+                            </th>
+                            <th>
+                              Confidence
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        {emotions}
+                        </tbody>
+                      </table>
+                      <br></br>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>
+                              Property
+                            </th>
+                            <th>
+                              Value
+                            </th>
+                            <th>
+                              Confidence
+                            </th>
+                          </tr>
+                        </thead>
+                        {misc}
+                      </table>
+                      <br></br>
                       <table>
                         <thead>
                           <tr>
