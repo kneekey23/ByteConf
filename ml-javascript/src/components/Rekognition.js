@@ -93,6 +93,17 @@ class Rekognition extends Component {
           if (err) {
               currentComponent.setState({resultMessage: err.message});
           }
+          else if (data.FaceDetails.length === 0){
+            currentComponent.setState({resultMessage: "No faces detected!"});
+            currentComponent.setState({resultLandmarks: []});
+            currentComponent.setState({resultEmotions: []});
+            currentComponent.setState({resultEyesOpen: []});
+            currentComponent.setState({resultMouthOpen: []});
+            currentComponent.setState({resultMustache: []});
+            currentComponent.setState({resultSmile: []});
+            currentComponent.setState({resultSunglasses: []});
+            currentComponent.setState({resultBeard: []});
+          }
           else {
               console.log(data);
               currentComponent.setState({resultLandmarks: data.FaceDetails[0].Landmarks});
@@ -156,45 +167,45 @@ class Rekognition extends Component {
                           {emotion.Type}
                         </td>
                         <td>
-                          {emotion.Confidence}
+                          { Math.floor(emotion.Confidence*10000)/10000 }
                         </td>
                     </tr>
               )
               
             })
             
-            
+            // all other binary properties thrown into one table
             misc = 
               <tbody>
               <tr>
                 <td>Smile</td>
                 <td>{ this.state.resultSmile.Value+'' }</td>
-                <td>{this.state.resultSmile.Confidence}</td>
+                <td>{ Math.floor(this.state.resultSmile.Confidence*10000)/10000 }</td>
               </tr>
               <tr>
                 <td>MouthOpen</td>
                 <td>{ this.state.resultMouthOpen.Value+'' }</td>
-                <td>{this.state.resultMouthOpen.Confidence}</td>
+                <td>{ Math.floor(this.state.resultMouthOpen.Confidence*10000)/10000 }</td>
               </tr>
               <tr>
                 <td>EyesOpen</td>
                 <td>{ this.state.resultEyesOpen.Value+'' }</td>
-                <td>{this.state.resultEyesOpen.Confidence}</td>
+                <td>{ Math.floor(this.state.resultEyesOpen.Confidence*10000)/10000 }</td>
               </tr>
               <tr>
                 <td>Sunglasses</td>
                 <td>{ this.state.resultSunglasses.Value+'' }</td>
-                <td>{this.state.resultSunglasses.Confidence}</td>
+                <td>{ Math.floor(this.state.resultSunglasses.Confidence*10000)/10000 }</td>
               </tr>
               <tr>
                 <td>Mustache</td>
                 <td>{ this.state.resultMustache.Value+'' }</td>
-                <td>{this.state.resultMustache.Confidence}</td>
+                <td>{ Math.floor(this.state.resultMustache.Confidence*10000)/10000 }</td>
               </tr>
               <tr>
                 <td>Beard</td>
                 <td>{ this.state.resultBeard.Value+'' }</td>
-                <td>{this.state.resultBeard.Confidence}</td>
+                <td>{ Math.floor(this.state.resultBeard.Confidence*10000)/10000 }</td>
               </tr>
               </tbody>
              
