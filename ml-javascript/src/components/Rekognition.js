@@ -14,6 +14,7 @@ class Rekognition extends Component {
             image: '',
             resultMessage: '',
             resultLabels: [],
+            resultLandmarks: [],
             imageSrc: '',
       
         }
@@ -49,7 +50,7 @@ class Rekognition extends Component {
           };
         
         // instantiate Rekognition client
-        var rekognition = new AWS.Rekognition({apiVersion: '2017-07-01'});
+        var rekognition = new AWS.Rekognition();
         let currentComponent = this;
 
         // call Rekognition's detectLabels method
@@ -64,13 +65,32 @@ class Rekognition extends Component {
             }
         });
 
+        
+        // call Rekognition's detectFaces method
+        // values of interest: Mustache, MouthOpen, EyesOpen, Landmarks
+        rekognition.detectFaces(RekognitionParams, function (err, data){
+          if (err) {
+              currentComponent.setState({resultMessage: err.message});
+          }
+          else {
+              console.log(data);
+              currentComponent.setState({resultLandmarks: data.FaceDetails[0].Landmarks});
+              //currentComponent.setState({resultlandmarks: data.FaceDetails});
+
+              // Add states for the other metadata
+              // currentComponent.setState({result})
+              currentComponent.setState({resultMessage: "Landmark detection complete!"})
+          }
+      });
+      
+
     }
 
     
     render(){
-        let result, labels;
+        let result, labels, landmarks;
         if(this.state.resultMessage !== ''){
-          result = <p>{this.state.resultMessage}</p>
+          result = <p>{this.state.resultMessage}</p>          
           labels = this.state.resultLabels.map((label, i) => {
               return (<tr key={i}>
                         <td>
@@ -78,6 +98,38 @@ class Rekognition extends Component {
                         </td>
                         <td>
                           {label.Confidence}
+                        </td>
+                    </tr>
+              )
+            
+            })
+            /*
+            landmarks = this.state.resultlandmarks.map((emotion, i) => {
+              return (<tr key={i}>
+                        <td key={j}>
+                          {emotion.FaceDetails[i].Landmarks[j].Type}
+                        </td>
+                        <td>
+                          {emotion.FaceDetails[i].Landmarks[j].X*400}
+                        </td>
+                        <td>
+                          {emotion.FaceDetails[i].Landmarks[j].Y*350}
+                        </td>
+                    </tr>
+              )
+              
+            })*/
+
+            landmarks = this.state.resultLandmarks.map((landmark, i) => {
+              return (<tr key={i}>
+                        <td>
+                          {landmark.Type}
+                        </td>
+                        <td>
+                          {landmark.X*400}
+                        </td>
+                        <td>
+                          {landmark.Y*350}
                         </td>
                     </tr>
               )
@@ -92,7 +144,8 @@ class Rekognition extends Component {
           <div className="App">
             <div className="container">
                 <h1>Rekognition</h1>
-                <p><code>detectLabels</code>: Detect object labels from an input image!</p>
+                <p><code>detectLabels</code>: Detect object labels from an input image/video!</p>
+                <p><code>detectFaces</code>: Detect faces and relevant metadata from an input image/video!</p>
                 <div className="row">
                     <div className="col-md-8">
                         <Form>
@@ -124,6 +177,24 @@ class Rekognition extends Component {
                         </thead>
                         <tbody>
                         {labels}
+                        </tbody>
+                      </table>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>
+                              Landmark Type
+                            </th>
+                            <th>
+                              X Coordinate
+                            </th>
+                            <th>
+                              Y Coordinate
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        {landmarks}
                         </tbody>
                       </table>
                     </div>
