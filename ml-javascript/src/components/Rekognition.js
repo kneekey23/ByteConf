@@ -15,6 +15,12 @@ class Rekognition extends Component {
             resultMessage: '',
             resultLabels: [],
             resultLandmarks: [],
+            resultEmotions: [],
+            resultEyesOpen: [],
+            resultMustache: [],
+            resultMouthOpen: [],
+            resultSmile: [],
+            resultSunglasses: [],
             imageSrc: '',
       
         }
@@ -37,7 +43,7 @@ class Rekognition extends Component {
         let buffer = dataUriToBuffer(imageSrc)
         
         // API call params
-        var RekognitionParams = {
+        var RekognitionDetectLabelsParams = {
             Image: {
               Bytes: buffer
               /* Alternatively, you can provide an S3 object 
@@ -49,12 +55,25 @@ class Rekognition extends Component {
             },
           };
         
+        var RekognitionDetectFacesParams = {
+            Image: {
+              Bytes: buffer
+              /* Alternatively, you can provide an S3 object 
+              S3Object: {
+                Bucket: 'STRING_VALUE',
+                Name: 'STRING_VALUE',
+                Version: 'STRING_VALUE'
+              }*/
+            },
+            Attributes: ["ALL"]
+          };
+
         // instantiate Rekognition client
         var rekognition = new AWS.Rekognition();
         let currentComponent = this;
-
+            
         // call Rekognition's detectLabels method
-        rekognition.detectLabels(RekognitionParams, function (err, data){
+        rekognition.detectLabels(RekognitionDetectLabelsParams, function (err, data){
             if (err) {
                 currentComponent.setState({resultMessage: err.message});
             }
@@ -68,18 +87,24 @@ class Rekognition extends Component {
         
         // call Rekognition's detectFaces method
         // values of interest: Mustache, MouthOpen, EyesOpen, Landmarks
-        rekognition.detectFaces(RekognitionParams, function (err, data){
+        rekognition.detectFaces(RekognitionDetectFacesParams, function (err, data){
           if (err) {
               currentComponent.setState({resultMessage: err.message});
           }
           else {
               console.log(data);
               currentComponent.setState({resultLandmarks: data.FaceDetails[0].Landmarks});
+              currentComponent.setState({resultEmotions: data.FaceDetails[0].Emotions});
+              currentComponent.setState({resultEyesOpen: data.FaceDetails[0].EyesOpen});
+              currentComponent.setState({resultMouthOpen: data.FaceDetails[0].MouthOpen});
+              currentComponent.setState({resultMustache: data.FaceDetails[0].Mustache});
+              currentComponent.setState({resultSmile: data.FaceDetails[0].Smile});
+              currentComponent.setState({resultSunglasses: data.FaceDetails[0].Sunglasses});
               //currentComponent.setState({resultlandmarks: data.FaceDetails});
 
               // Add states for the other metadata
               // currentComponent.setState({result})
-              currentComponent.setState({resultMessage: "Landmark detection complete!"})
+              currentComponent.setState({resultMessage: "Facial detection complete!"})
           }
       });
       
@@ -88,7 +113,7 @@ class Rekognition extends Component {
 
     
     render(){
-        let result, labels, landmarks;
+        let result, labels, landmarks /* emotions, mustaches, beards, sunglasses*/;
         if(this.state.resultMessage !== ''){
           result = <p>{this.state.resultMessage}</p>          
           labels = this.state.resultLabels.map((label, i) => {
@@ -97,28 +122,12 @@ class Rekognition extends Component {
                           {label.Name}
                         </td>
                         <td>
-                          {label.Confidence}
+                          {Math.floor(label.Confidence*10000)/10000}
                         </td>
                     </tr>
               )
             
             })
-            /*
-            landmarks = this.state.resultlandmarks.map((emotion, i) => {
-              return (<tr key={i}>
-                        <td key={j}>
-                          {emotion.FaceDetails[i].Landmarks[j].Type}
-                        </td>
-                        <td>
-                          {emotion.FaceDetails[i].Landmarks[j].X*400}
-                        </td>
-                        <td>
-                          {emotion.FaceDetails[i].Landmarks[j].Y*350}
-                        </td>
-                    </tr>
-              )
-              
-            })*/
 
             landmarks = this.state.resultLandmarks.map((landmark, i) => {
               return (<tr key={i}>
@@ -126,15 +135,28 @@ class Rekognition extends Component {
                           {landmark.Type}
                         </td>
                         <td>
-                          {landmark.X*400}
+                          {Math.floor((landmark.X*400)*10000)/10000}
                         </td>
                         <td>
-                          {landmark.Y*350}
+                          {Math.floor((landmark.Y*350)*10000)/10000}
                         </td>
                     </tr>
               )
               
             })
+            /* to be added with emotions 
+            emotions = this.state.resultEmotions.map((emotion, i) => {
+              return (<tr key={i}>
+                        <td>
+                          {emotion.Type}
+                        </td>
+                        <td>
+                          {emotion.Confidence}
+                        </td>
+                    </tr>
+              )
+              
+            }) */
           
         }
         const videoConstraints = {
@@ -147,7 +169,7 @@ class Rekognition extends Component {
                 <p><code>detectLabels</code>: Detect object labels from an input image/video!</p>
                 <p><code>detectFaces</code>: Detect faces and relevant metadata from an input image/video!</p>
                 <div className="row">
-                    <div className="col-md-8">
+                    <div className="col-md-6">
                         <Form>
                             <Webcam
                               audio={false}
@@ -162,7 +184,7 @@ class Rekognition extends Component {
                         
                         </Form>
                     </div>
-                    <div className="col-md-4">
+                    <div className="col-md-3">
                       <span>Results:</span>{result}
                       <table>
                         <thead>
@@ -179,6 +201,8 @@ class Rekognition extends Component {
                         {labels}
                         </tbody>
                       </table>
+                    </div>
+                    <div className="col-md-3">
                       <table>
                         <thead>
                           <tr>
