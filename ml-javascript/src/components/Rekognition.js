@@ -1,10 +1,12 @@
 import React, {Component} from 'react';
 import { Form } from 'semantic-ui-react';
 import Webcam from 'react-webcam';
+import {Predictions } from 'aws-amplify';
 var dataUriToBuffer = require('data-uri-to-buffer');
-var AWS = require('aws-sdk');
-AWS.config.region = 'us-east-1'; 
-AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'us-east-1:1956382a-b3f6-472c-9a8d-3a246853c917'});
+
+// var AWS = require('aws-sdk');
+// AWS.config.region = 'us-east-1'; 
+// AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'us-east-1:1956382a-b3f6-472c-9a8d-3a246853c917'});
 
 class Rekognition extends Component {
     constructor(props){
@@ -31,38 +33,57 @@ class Rekognition extends Component {
     }
     
     sendImageToRekognition = (imageSrc) => {
-        
+      
         // convert image to buffer from base64
         let buffer = dataUriToBuffer(imageSrc)
+        let bytes = new Uint8Array(buffer);
+
+        Predictions.identify({
+          labels: {
+          source: {
+              bytes
+          },
+          type: "LABELS"
+          }
+      }).then(response => {
+       
+          const { labels } = response;
+
+          this.setState({resultLabels: labels});
+          this.setState({resultMessage: "Classification successful!"})
+
+      }).catch(err => {
+        this.setState({resultMessage: err.message});
+      })
         
         // API call params
-        var RekognitionParams = {
-            Image: {
-              Bytes: buffer
-              /* Alternatively, you can provide an S3 object 
-              S3Object: {
-                Bucket: 'STRING_VALUE',
-                Name: 'STRING_VALUE',
-                Version: 'STRING_VALUE'
-              }*/
-            },
-          };
+        // var RekognitionParams = {
+        //     Image: {
+        //       Bytes: buffer
+        //       /* Alternatively, you can provide an S3 object 
+        //       S3Object: {
+        //         Bucket: 'STRING_VALUE',
+        //         Name: 'STRING_VALUE',
+        //         Version: 'STRING_VALUE'
+        //       }*/
+        //     },
+        //   };
         
-        // instantiate Rekognition client
-        var rekognition = new AWS.Rekognition({apiVersion: '2017-07-01'});
-        let currentComponent = this;
+        // // instantiate Rekognition client
+        // var rekognition = new AWS.Rekognition({apiVersion: '2017-07-01'});
+        // let currentComponent = this;
 
-        // call Rekognition's detectLabels method
-        rekognition.detectLabels(RekognitionParams, function (err, data){
-            if (err) {
-                currentComponent.setState({resultMessage: err.message});
-            }
-            else {
-                console.log(data);
-                currentComponent.setState({resultLabels: data.Labels});
-                currentComponent.setState({resultMessage: "Classification successful!"})
-            }
-        });
+        // // call Rekognition's detectLabels method
+        // rekognition.detectLabels(RekognitionParams, function (err, data){
+        //     if (err) {
+        //         currentComponent.setState({resultMessage: err.message});
+        //     }
+        //     else {
+        //         console.log(data);
+        //         currentComponent.setState({resultLabels: data.Labels});
+        //         currentComponent.setState({resultMessage: "Classification successful!"})
+        //     }
+        // });
 
     }
 
@@ -71,13 +92,13 @@ class Rekognition extends Component {
         let result, labels;
         if(this.state.resultMessage !== ''){
           result = <p>{this.state.resultMessage}</p>
-          labels = this.state.resultLabels.map((label, i) => {
+          labels = this.state.resultLabels.map((object, i) => {
               return (<tr key={i}>
                         <td>
-                          {label.Name}
+                          {object.name}
                         </td>
                         <td>
-                          {label.Confidence}
+                          {object.metadata.confidence}
                         </td>
                     </tr>
               )

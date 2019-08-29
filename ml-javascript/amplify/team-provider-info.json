@@ -1,0 +1,19 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "ml-javascript-dev-20190829133128-authRole",
+            "UnauthRoleArn": "arn:aws:iam::805580953652:role/ml-javascript-dev-20190829133128-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::805580953652:role/ml-javascript-dev-20190829133128-authRole",
+            "Region": "us-west-2",
+            "DeploymentBucketName": "ml-javascript-dev-20190829133128-deployment",
+            "UnauthRoleName": "ml-javascript-dev-20190829133128-unauthRole",
+            "StackName": "ml-javascript-dev-20190829133128",
+            "StackId": "arn:aws:cloudformation:us-west-2:805580953652:stack/ml-javascript-dev-20190829133128/faf43200-ca9b-11e9-928e-064b816f3a4a"
+        },
+        "categories": {
+            "auth": {
+                "mljavascriptb9737d90": {}
+            }
+        }
+    }
+}
