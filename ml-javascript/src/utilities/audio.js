@@ -127,7 +127,8 @@ function getAudioStream() {
     const encodedWav = encodeWAV(downsampledBuffer);
 
     const audioBlob = new Blob([encodedWav], {
-      type: 'application/octet-stream'
+     // type: 'application/octet-stream'
+     type:'audio/pcm'
     });
   
     return audioBlob;

@@ -1,8 +1,6 @@
 import React, {Component} from 'react'
-var AWS = require('aws-sdk');
-AWS.config.region = 'us-east-1'; 
-AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'us-east-1:1956382a-b3f6-472c-9a8d-3a246853c917'});
 
+import {Predictions } from 'aws-amplify';
 
 class Translate extends Component {
     constructor(props){
@@ -11,7 +9,7 @@ class Translate extends Component {
         this.state = {
             text: '',
             resultMessage: '',
-            resultTranslation: '' // constituent values are mixed, positive, neutral, and negative
+            resultTranslation: ''
         }
         this.onChangeText = this.onChangeText.bind(this);
         this.sendTextToTranslate = this.sendTextToTranslate.bind(this);
@@ -22,30 +20,25 @@ class Translate extends Component {
     }
 
     sendTextToTranslate = () => {
-        // API call params
-        // full list of language codes available here: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Translate.html#translateText-property
-        var TranslateParams = {
-            SourceLanguageCode: 'en',
-            TargetLanguageCode: 'es',
-            Text: ""
-        };
-        TranslateParams.Text = this.state.text;
-        
-        // instantiate Translate client
-        var Translate = new AWS.Translate({apiVersion: '2017-07-01'});
-        let currentComponent = this;
 
-        // call translateText method
-        Translate.translateText(TranslateParams, function (err, data){
-            if (err) {
-                currentComponent.setState({resultMessage: err.message});
-            }
-            else {
-                currentComponent.setState({resultTranslation: data.TranslatedText});
-                currentComponent.setState({resultMessage: "Text translation successful!"})
-            }
-        });
 
+      Predictions.convert({
+        translateText: {
+          source: {
+            text: this.state.text
+            // language : "es" // defaults configured on aws-exports.js
+            // supported languages https://docs.aws.amazon.com/translate/latest/dg/how-it-works.html#how-it-works-language-codes
+          },
+          // targetLanguage: "en"
+        }
+      }).then(result => {
+        console.log(result);
+          this.setState({resultTranslation: result.text});
+          this.setState({resultMessage: "Text translation successful!"})
+      })
+        .catch(err => {
+          this.setState({resultMessage: err.message});
+        })
     }
 
 

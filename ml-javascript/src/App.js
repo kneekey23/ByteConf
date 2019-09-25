@@ -7,6 +7,12 @@ import Main from './components/Main';
 import Comprehend from './components/Comprehend';
 import Rekognition from './components/Rekognition';
 import Translate from './components/Translate';
+import Amplify from '@aws-amplify/core';
+import { AmazonAIPredictionsProvider } from '@aws-amplify/predictions';
+import awsconfig from './aws-exports';
+
+Amplify.configure(awsconfig);
+Amplify.addPluggable(new AmazonAIPredictionsProvider());
 
 
 class App extends Component {

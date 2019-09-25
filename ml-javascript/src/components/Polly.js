@@ -1,9 +1,6 @@
 import React, {Component} from 'react';
 import ReactAudioPlayer from 'react-audio-player';
-var AWS = require('aws-sdk');
-AWS.config.region = 'us-east-1'; 
-AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'us-east-1:1956382a-b3f6-472c-9a8d-3a246853c917'});
-
+import {Predictions } from 'aws-amplify';
 
 class Polly extends Component {
     constructor(props){
@@ -25,35 +22,26 @@ class Polly extends Component {
       }
       
       sendTextToPolly = () => {
-            // Create synthesizeSpeech params JSON
-            var speechParams = {
-              OutputFormat: "mp3",
-              SampleRate: "16000",
-              Text: "",
-              TextType: "text",
-              VoiceId: "Brian"
-          };
-      
-          speechParams.Text = this.state.text;
-          //your polly call goes here, this is extra credit!
-          // Create the Polly service object and presigner object
-          var polly = new AWS.Polly({apiVersion: '2016-06-10'});
-          var signer = new AWS.Polly.Presigner(speechParams, polly)
-          let currentComponent = this;
-          // Create presigned URL of synthesized speech file
-          signer.getSynthesizeSpeechUrl(speechParams, (error, url) => {
-              if (error) {
-                currentComponent.setState({resultMessage: error.message});
-      
-              } else {
-                 //audioSource.src = url;
-                currentComponent.setState({pollyUrl: url});
+
+          Predictions.convert({
+            textToSpeech: {
+              source: {
+                text: this.state.text
+              },
+              voiceId: "Justin" // default configured on aws-exports.js 
+              // list of different options are here https://docs.aws.amazon.com/polly/latest/dg/voicelist.html
+            }
+          })
+          .then(result => {
+
+            this.setState({pollyUrl: result.speech.url});
            
-                currentComponent.setState({resultMessage: "Speech ready to play"});
-             
-              }
-          });
-          
+            this.setState({resultMessage: "Speech ready to play"});
+          })
+          .catch(err => {
+              console.log(JSON.stringify(err, null, 2));
+              this.setState({resultMessage: err.message});
+          })
       }
       
         render() {

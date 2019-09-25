@@ -5,7 +5,7 @@ class Main extends Component {
 
     render() {
         return(<div className="container">
-                    <h1>Welcome ByteConf!</h1>
+                    <h1>Welcome Twitch!</h1>
                     <div className="col-xs-12">
                         <div className="row">
                             <div className="card">

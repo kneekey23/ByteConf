@@ -1,7 +1,5 @@
 import React, {Component} from 'react'
-var AWS = require('aws-sdk');
-AWS.config.region = 'us-east-1'; 
-AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'us-east-1:1956382a-b3f6-472c-9a8d-3a246853c917'});
+import {Predictions } from 'aws-amplify';
 
 class Comprehend extends Component {
     constructor(props){
@@ -22,35 +20,27 @@ class Comprehend extends Component {
     }
 
     sendTextToComprehend = () => {
-        // API call params
-        var comprehendParams = {
-            LanguageCode: "en",
-            Text: ""
-        };
-        comprehendParams.Text = this.state.text;
-        
-        // instantiate comprehend client
-        var comprehend = new AWS.Comprehend({apiVersion: '2017-11-27'});
-        let currentComponent = this;
 
-        // call detectSentiment endpoint
-        comprehend.detectSentiment(comprehendParams, function (err, data){
-            if (err) {
-                currentComponent.setState({resultMessage: err.message});
-                currentComponent.setState({resultSentiment: ""})
-                currentComponent.setState({resultSentimentScore: ""});
-            }
-            else {
-                currentComponent.setState({resultMessage: "Text analyzed!"})
-                currentComponent.setState({resultSentiment: data.Sentiment});
-                currentComponent.setState({resultSentimentScore: JSON.stringify(data.SentimentScore)});
-                /*
-                for (var key in data.SentimentScore)
-                {
-                this.state.resultSentimentScore.push(data.SentimentScore[key]);
-                }*/
-            }
-        });
+
+      Predictions.interpret({
+        text: {
+          source: {
+            text: this.state.text
+          },
+          type: "LANGUAGE"
+        }
+      }).then(result => {
+        console.log(result);
+        this.setState({resultMessage: "Text analyzed!"})
+        this.setState({resultSentiment: result.textInterpretation.sentiment.predominant});
+        //this.setState({resultSentimentScore: JSON.stringify(result.SentimentScore)});
+
+      })
+        .catch(err => {
+          this.setState({resultMessage: err.message});
+          this.setState({resultSentiment: ""})
+          this.setState({resultSentimentScore: ""});
+        })
 
     }
 
@@ -70,7 +60,7 @@ class Comprehend extends Component {
                 <div className="col-md-6">
                   <form>
                       <div className="form-group">
-                          <textarea class="form-control" rows="5" value={this.state.text} onChange={this.onChangeText} placeholder="Enter the text for Comprehend to analyze!"/>
+                          <textarea className="form-control" rows="5" value={this.state.text} onChange={this.onChangeText} placeholder="Enter the text for Comprehend to analyze!"/>
                       </div>
                       <button type="button" className="btn btn-success" onClick={this.sendTextToComprehend}>Analyze text with Comprehend</button>
                     </form>
