@@ -4,10 +4,6 @@ import Webcam from 'react-webcam';
 import {Predictions } from 'aws-amplify';
 var dataUriToBuffer = require('data-uri-to-buffer');
 
-// var AWS = require('aws-sdk');
-// AWS.config.region = 'us-east-1'; 
-// AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'us-east-1:1956382a-b3f6-472c-9a8d-3a246853c917'});
-
 class Rekognition extends Component {
     constructor(props){
         super(props);
@@ -56,35 +52,6 @@ class Rekognition extends Component {
         this.setState({resultMessage: err.message});
       })
         
-        // API call params
-        // var RekognitionParams = {
-        //     Image: {
-        //       Bytes: buffer
-        //       /* Alternatively, you can provide an S3 object 
-        //       S3Object: {
-        //         Bucket: 'STRING_VALUE',
-        //         Name: 'STRING_VALUE',
-        //         Version: 'STRING_VALUE'
-        //       }*/
-        //     },
-        //   };
-        
-        // // instantiate Rekognition client
-        // var rekognition = new AWS.Rekognition({apiVersion: '2017-07-01'});
-        // let currentComponent = this;
-
-        // // call Rekognition's detectLabels method
-        // rekognition.detectLabels(RekognitionParams, function (err, data){
-        //     if (err) {
-        //         currentComponent.setState({resultMessage: err.message});
-        //     }
-        //     else {
-        //         console.log(data);
-        //         currentComponent.setState({resultLabels: data.Labels});
-        //         currentComponent.setState({resultMessage: "Classification successful!"})
-        //     }
-        // });
-
     }
 
     

@@ -1,8 +1,5 @@
 import React, {Component} from 'react'
 import {Predictions } from 'aws-amplify';
-//var AWS = require('aws-sdk');
-//AWS.config.region = 'us-east-1'; 
-//AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'us-east-1:1956382a-b3f6-472c-9a8d-3a246853c917'});
 
 class Comprehend extends Component {
     constructor(props){
@@ -44,37 +41,6 @@ class Comprehend extends Component {
           this.setState({resultSentiment: ""})
           this.setState({resultSentimentScore: ""});
         })
-
-
-        // // API call params
-        // var comprehendParams = {
-        //     LanguageCode: "en",
-        //     Text: ""
-        // };
-        // comprehendParams.Text = this.state.text;
-        
-        // // instantiate comprehend client
-        // var comprehend = new AWS.Comprehend({apiVersion: '2017-11-27'});
-        // let currentComponent = this;
-
-        // // call detectSentiment endpoint
-        // comprehend.detectSentiment(comprehendParams, function (err, data){
-        //     if (err) {
-        //         currentComponent.setState({resultMessage: err.message});
-        //         currentComponent.setState({resultSentiment: ""})
-        //         currentComponent.setState({resultSentimentScore: ""});
-        //     }
-        //     else {
-        //         currentComponent.setState({resultMessage: "Text analyzed!"})
-        //         currentComponent.setState({resultSentiment: data.Sentiment});
-        //         currentComponent.setState({resultSentimentScore: JSON.stringify(data.SentimentScore)});
-        //         /*
-        //         for (var key in data.SentimentScore)
-        //         {
-        //         this.state.resultSentimentScore.push(data.SentimentScore[key]);
-        //         }*/
-        //     }
-        // });
 
     }
 

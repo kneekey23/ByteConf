@@ -21,6 +21,16 @@
 			"service": "Rekognition",
 			"dependsOn": [],
 			"identifyType": "identifyLabels"
+		},
+		"speechGenerator3003be1d": {
+			"providerPlugin": "awscloudformation",
+			"service": "Polly",
+			"convertType": "speechGenerator"
+		},
+		"transcription1decb5e9": {
+			"providerPlugin": "awscloudformation",
+			"service": "Transcribe",
+			"convertType": "transcription"
 		}
 	}
 }

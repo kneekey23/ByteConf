@@ -2,11 +2,6 @@ import React, {Component} from 'react'
 
 import {Predictions } from 'aws-amplify';
 
-// var AWS = require('aws-sdk');
-// AWS.config.region = 'us-east-1'; 
-// AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'us-east-1:1956382a-b3f6-472c-9a8d-3a246853c917'});
-
-
 class Translate extends Component {
     constructor(props){
         super(props);
@@ -44,30 +39,6 @@ class Translate extends Component {
         .catch(err => {
           this.setState({resultMessage: err.message});
         })
-        // API call params
-        // full list of language codes available here: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Translate.html#translateText-property
-        // var TranslateParams = {
-        //     SourceLanguageCode: 'en',
-        //     TargetLanguageCode: 'es',
-        //     Text: ""
-        // };
-        // TranslateParams.Text = this.state.text;
-        
-        // // instantiate Translate client
-        // var Translate = new AWS.Translate({apiVersion: '2017-07-01'});
-        // let currentComponent = this;
-
-        // // call translateText method
-        // Translate.translateText(TranslateParams, function (err, data){
-        //     if (err) {
-        //         currentComponent.setState({resultMessage: err.message});
-        //     }
-        //     else {
-        //         currentComponent.setState({resultTranslation: data.TranslatedText});
-        //         currentComponent.setState({resultMessage: "Text translation successful!"})
-        //     }
-        // });
-
     }
 
 
