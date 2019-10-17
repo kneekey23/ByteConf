@@ -81,7 +81,7 @@ class Transcribe extends Component {
           },
         })
         .then(result => {
-          console.log(result.transcription.fullText)
+          console.log(result)
           this.setState({transcriptionJobComplete: true});
 
           this.setState({transcription: result.transcription.fullText})

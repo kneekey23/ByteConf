@@ -28,7 +28,7 @@ class Polly extends Component {
               source: {
                 text: this.state.text
               },
-              voiceId: "Justin" // default configured on aws-exports.js 
+              voiceId: "Nicole" // default configured on aws-exports.js 
               // list of different options are here https://docs.aws.amazon.com/polly/latest/dg/voicelist.html
             }
           })
