@@ -27,7 +27,7 @@ class Comprehend extends Component {
           source: {
             text: this.state.text
           },
-          type: "LANGUAGE"
+          type: "ALL"
         }
       }).then(result => {
         console.log(result);
